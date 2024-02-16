@@ -1,0 +1,12 @@
+﻿@using MedicalQuestions.Dto
+@model LoginUserViewModel
+
+@{
+    ViewData["Title"] = "register";
+}
+
+<form asp-controller="Login" asp-action="DoRegister" method="post">
+    Потребителско име: <input asp-for="Username" /><br />
+    Парола: <input asp-for="Password" /><br />
+    <button type="submit">Register</button>
+</form>
