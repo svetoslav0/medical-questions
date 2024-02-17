@@ -1,5 +1,6 @@
 ﻿using MedicalQuestions.Data;
 using MedicalQuestions.Models;
+using MedicalQuestions.Helpers;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +23,9 @@ namespace MedicalQuestions.Controllers
 
             var data = db.Users
                 .ToList();
+
+            string username = this.HttpContext.Session.Get<string>("username");
+            string userRole = this.HttpContext.Session.Get<string>("userRole");
 
             return View();
         }

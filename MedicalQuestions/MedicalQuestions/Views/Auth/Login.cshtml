@@ -5,7 +5,7 @@
     ViewData["Title"] = "Вход";
 }
 
-<form asp-controller="Login" asp-action="Login" method="post">
+<form asp-controller="Auth" asp-action="Login" method="post">
     Потребителско име: <input asp-for="Username" /><br />
     Парола: <input asp-for="Password" /><br />
     <button type="submit">Вход</button>
