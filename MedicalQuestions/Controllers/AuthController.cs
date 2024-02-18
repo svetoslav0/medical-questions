@@ -9,7 +9,7 @@ using MedicalQuestions.Services;
 
 namespace MedicalQuestions.Controllers
 {
-    public class AuthController : Controller
+    public class AuthController : BaseController
     {
         public MladostPublicContext DbContext { get; set; }
         public AuthService AuthService { get; set; }
@@ -25,6 +25,12 @@ namespace MedicalQuestions.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            string username = this.HttpContext.Session.Get<string>("username");
+            if (!string.IsNullOrEmpty(username))
+            {
+                return this.RedirectToHomePage();
+            }
+
             return View();
         }
 
@@ -43,7 +49,7 @@ namespace MedicalQuestions.Controllers
                 this.HttpContext.Session.Set<string>("username", user.Username);
                 this.HttpContext.Session.Set<string>("userRole", user.Role.Name);
 
-                return this.RedirectToAction("Index", "Home");
+                return this.RedirectToHomePage();
             }
 
             ViewBag.ShowError = true;
@@ -55,7 +61,7 @@ namespace MedicalQuestions.Controllers
             this.HttpContext.Session.Remove("username");
             this.HttpContext.Session.Remove("userRole");
 
-            return Ok();
+            return this.RedirectToHomePage();
         }
 
         public IActionResult Register()

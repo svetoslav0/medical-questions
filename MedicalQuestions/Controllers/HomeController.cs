@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace MedicalQuestions.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
 
@@ -19,19 +19,15 @@ namespace MedicalQuestions.Controllers
 
         public IActionResult Index()
         {
-            using var db = new MladostPublicContext();
-
-            var data = db.Users
-                .ToList();
-
-            string username = this.HttpContext.Session.Get<string>("username");
-            string userRole = this.HttpContext.Session.Get<string>("userRole");
+            this.AttachUserDataToViewBag();
 
             return View();
         }
 
         public IActionResult Privacy()
         {
+            this.AttachUserDataToViewBag();
+
             return View();
         }
 
