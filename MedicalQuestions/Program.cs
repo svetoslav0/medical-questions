@@ -1,4 +1,5 @@
 using MedicalQuestions.Data;
+using MedicalQuestions.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,12 +8,15 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<MladostPublicContext>();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(1440);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
 

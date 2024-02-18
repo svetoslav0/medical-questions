@@ -3,19 +3,23 @@ using MedicalQuestions.Dto;
 using MedicalQuestions.Data.Models;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using MedicalQuestions.Helpers;
 using Microsoft.EntityFrameworkCore;
+using MedicalQuestions.Services;
 
 namespace MedicalQuestions.Controllers
 {
     public class AuthController : Controller
     {
-        public MladostPublicContext dbContext { get; set; }
+        public MladostPublicContext DbContext { get; set; }
+        public AuthService AuthService { get; set; }
 
-        public AuthController(MladostPublicContext dbContext)
+        public AuthController(
+            MladostPublicContext dbContext,
+            AuthService authService)
         {
-            this.dbContext = dbContext;
+            this.DbContext = dbContext;
+            this.AuthService = authService;
         }
 
         [HttpGet]
@@ -25,29 +29,25 @@ namespace MedicalQuestions.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(LoginUserViewModel user)
+        public IActionResult Login(LoginUserViewModel userModel)
         {
-            User dbUser = this.dbContext
+            User user = this.DbContext
                 .Users
                 .Include(x => x.Role)
-                .FirstOrDefault(x => x.Username == user.Username);
+                .FirstOrDefault(x => x.Username == userModel.Username);
 
-            if (dbUser == null)
+            bool areCredentialsValid = this.AuthService.AreCredentialsValid(user, userModel.Password);
+
+            if (areCredentialsValid)
             {
-                // TODO: unsuccessful login
+                this.HttpContext.Session.Set<string>("username", user.Username);
+                this.HttpContext.Session.Set<string>("userRole", user.Role.Name);
+
+                return this.RedirectToAction("Index", "Home");
             }
 
-            bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(user.Password, dbUser.Password);
-
-            if (!isPasswordCorrect)
-            {
-                // TODO: unsuccessful login
-            }
-
-            this.HttpContext.Session.Set<string>("username", dbUser.Username);
-            this.HttpContext.Session.Set<string>("userRole", dbUser.Role.Name);
-
-            return Ok();
+            ViewBag.ShowError = true;
+            return View();
         }
 
         public IActionResult Logout()
@@ -74,8 +74,8 @@ namespace MedicalQuestions.Controllers
                 Password = passwordHash
             };
 
-            dbContext.Users.Add(dbUser);
-            dbContext.SaveChanges();
+            DbContext.Users.Add(dbUser);
+            DbContext.SaveChanges();
 
             return Ok();
         }

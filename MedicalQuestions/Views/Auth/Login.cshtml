@@ -3,6 +3,14 @@
 
 @{
     ViewData["Title"] = "Вход";
+    bool showError = ViewBag.ShowError ?? false;
+}
+
+@if (showError)
+{
+    <div>
+        Невалидно потребителско име или парола!
+    </div>
 }
 
 <form asp-controller="Auth" asp-action="Login" method="post">
