@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Въпроси и отговори";
+    bool isUserLoggedIn = ViewBag.IsUserLoggedIn ?? false;
+}
+
+<h1>
+    Въпроси и отговори
+</h1>
+
+@if (!isUserLoggedIn)
+{
+    <h2>
+        За да задавате въпроси е необходимо да направите безплатна регистрация
+        <a asp-controller="Auth" asp-action="SignUp">тук</a>
+    </h2>
+}
+else
+{
+    <h2>Not implemented yet.</h2>
+}

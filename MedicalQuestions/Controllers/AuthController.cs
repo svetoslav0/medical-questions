@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using MedicalQuestions.Helpers;
 using Microsoft.EntityFrameworkCore;
 using MedicalQuestions.Services;
+using MedicalQuestions.Email;
+using MedicalQuestions.Email.Interfaces;
 
 namespace MedicalQuestions.Controllers
 {
@@ -13,20 +15,22 @@ namespace MedicalQuestions.Controllers
     {
         public MladostPublicContext DbContext { get; set; }
         public AuthService AuthService { get; set; }
+        public IEmailSender EmailSender { get; set; }
 
         public AuthController(
             MladostPublicContext dbContext,
-            AuthService authService)
+            AuthService authService,
+            IEmailSender emailSender)
         {
             this.DbContext = dbContext;
             this.AuthService = authService;
+            EmailSender = emailSender;
         }
 
         [HttpGet]
         public IActionResult Login()
         {
-            string username = this.HttpContext.Session.Get<string>("username");
-            if (!string.IsNullOrEmpty(username))
+            if (this.IsUserLoggedIn())
             {
                 return this.RedirectToHomePage();
             }
@@ -64,11 +68,62 @@ namespace MedicalQuestions.Controllers
             return this.RedirectToHomePage();
         }
 
+        public IActionResult SignUp()
+        {
+            if (this.IsUserLoggedIn())
+            {
+                return this.RedirectToHomePage();
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult DoSignUp(CreateProfileViewModel model)
+        {
+            string userPassword = this.AuthService.GeneratePassword();
+
+            User user = new User
+            {
+                Username = this.AuthService.GenerateUniqueUsername(model.CompanyName),
+                Password = BCrypt.Net.BCrypt.HashPassword(userPassword),
+                RoleId = Common.Constants.UserRole.User
+            };
+
+            Profile profile = new Profile
+            {
+                CompanyName = model.CompanyName,
+                PhysicalAddress = model.PhisicalAddress,
+                EmailAddress = model.EmailAddress,
+                ContactPerson = model.ContactPerson,
+                Phone = model.Phone,
+                EconomicSector = model.EconomicalSector,
+                EmployeesCount = model.EmployeesCount,
+                User = user
+            };
+
+            user.Profile = profile;
+
+            string mailSubject = "Вашият профил е създаден";
+            string mailBody = $"Използвайте потребителското име и парола по-долу за вход в системата. Потребителско име: {user.Username}, парола: {userPassword}";
+            var message = new Message(model.EmailAddress, mailSubject, mailBody);
+            this.EmailSender.SendEmail(message);
+
+            this.DbContext.Users.Add(user);
+            this.DbContext.Profiles.Add(profile);
+            this.DbContext.SaveChanges();
+
+            return Ok();
+        }
+
+
+        // todo: will be removed in prod
         public IActionResult Register()
         {
             return View();
         }
 
+        // todo: will be removed in prod
         [HttpPost]
         public IActionResult DoRegister(LoginUserViewModel user)
         {

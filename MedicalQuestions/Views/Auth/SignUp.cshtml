@@ -1,0 +1,16 @@
+﻿@using MedicalQuestions.Dto
+@model CreateProfileViewModel
+@{
+    ViewData["Title"] = "Създаване на акаунт";
+}
+
+<form asp-controller="Auth" asp-action="DoSignUp" method="post">
+    Име на фирмата:<span style="color: red; font-weight: bold">*</span> <input asp-for="CompanyName" /><br />
+    Адрес:<span style="color: red; font-weight: bold">*</span> <input asp-for="PhisicalAddress" /><br />
+    Имейл:<span style="color: red; font-weight: bold">*</span> <input asp-for="EmailAddress" /><br />
+    Лице за контакт:<span style="color: red; font-weight: bold">*</span> <input asp-for="ContactPerson" /><br />
+    Телефон:<span style="color: red; font-weight: bold">*</span> <input asp-for="Phone" /><br />
+    Икономически сектор:<span style="color: red; font-weight: bold">*</span> <input asp-for="EconomicalSector" /><br />
+    Брой служители:<span style="color: red; font-weight: bold">*</span> <input asp-for="EmployeesCount" /><br />
+    <button type="submit">Създай акаунт</button>
+</form>

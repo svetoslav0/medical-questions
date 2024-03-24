@@ -23,5 +23,12 @@ namespace MedicalQuestions.Controllers
                 ViewBag.UserRole = userRole.ToLower();
             }
         }
+
+        protected bool IsUserLoggedIn()
+        {
+            string username = this.HttpContext.Session.Get<string>("username");
+
+            return !string.IsNullOrEmpty(username);
+        }
     }
 }

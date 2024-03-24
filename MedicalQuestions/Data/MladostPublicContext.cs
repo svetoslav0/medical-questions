@@ -17,10 +17,17 @@ namespace MedicalQuestions.Data
                 .HasMany(x => x.Users)
                 .WithOne(x => x.Role)
                 .HasForeignKey(x => x.RoleId);
+
+            modelBuilder.Entity<User>()
+                .HasOne(x => x.Profile)
+                .WithOne(x => x.User)
+                .HasForeignKey<Profile>(x => x.UserId);
         }
 
         public DbSet<User> Users { get; set; }
 
         public DbSet<UserRole> UserRoles { get; set; }
+
+        public DbSet<Profile> Profiles { get; set; }
     }
 }

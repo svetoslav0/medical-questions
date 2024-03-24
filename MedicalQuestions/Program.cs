@@ -1,7 +1,15 @@
 using MedicalQuestions.Data;
 using MedicalQuestions.Services;
+using MedicalQuestions.Email;
+using MedicalQuestions.Email.Config;
+using MedicalQuestions.Email.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+
+EmailConfiguration emailConfig = builder
+    .Configuration
+    .GetSection("EmailConfiguration")
+    .Get<EmailConfiguration>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -17,8 +25,16 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddSingleton<EmailConfiguration>(emailConfig);
 
 var app = builder.Build();
+
+builder.Configuration
+    .SetBasePath(app.Environment.ContentRootPath)
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{app.Environment.EnvironmentName}.json", true)
+    .AddEnvironmentVariables();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

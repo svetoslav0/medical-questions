@@ -11,5 +11,7 @@
         public UserRole Role { get; set; }
 
         public int RoleId { get; set; }
+
+        public Profile Profile { get; set; }
     }
 }
